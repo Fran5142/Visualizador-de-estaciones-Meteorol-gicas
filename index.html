@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>E.M.A</title>
+
+<!-- Fuentes e iconos -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(160deg,#001a33,#002b55,#001a33);
+  color: #fff;
+  margin:0; padding:0; line-height:1.6;
+}
+
+/* Barra superior */
+nav {
+  background-color: rgba(0,31,63,0.5);
+  backdrop-filter: blur(8px);
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 20px rgba(0,255,255,0.2);
+  border-bottom: 1px solid #004080;
+}
+nav .logo img, nav .logo-right img {height: 115px;}
+nav ul {list-style:none;display:flex;margin:0;padding:0;}
+nav ul li {margin-left:11px;}
+nav ul li a {
+  color:#c0e8ff;
+  text-decoration:none;
+  padding:10px 15px;
+  border-radius:5px;
+  font-weight:800;
+  font-size:1.8rem;
+  transition:all .3s ease;
+}
+nav ul li a:hover {background:#004080;color:#d0e8ff;}
+
+/* Hora */
+.time-container {
+  display:flex;justify-content:center;flex-wrap:wrap;gap:50px;
+  margin:20px 0;font-size:1.3rem;font-weight:500;
+  background:rgba(0,34,68,0.4);padding:15px 25px;border-radius:10px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.3);
+}
+.time-container i {color:#00f0ff;margin-right:8px;}
+
+/* Slideshow */
+.slideshow-container {
+  width:90%;max-width:800px;height:450px;
+  position:relative;overflow:hidden;border-radius:12px;
+  box-shadow:0 6px 16px rgba(0,0,0,0.5);margin:30px auto;
+}
+.slide {opacity:0;position:absolute;width:100%;transition:opacity 1s ease-in-out;}
+.slide.active {opacity:1;position:relative;}
+.slide img {
+  width:100%;height:100%;border-radius:15px;
+  filter:brightness(0.9);object-fit:cover;transition:transform .8s ease;
+}
+.slide.active img {transform:scale(1.02);}
+
+/* Footer */
+footer {
+  margin-top:80px;padding:20px;font-size:0.9rem;
+  background:rgba(255,255,255,0.05);
+  border-top:1px solid rgba(255,255,255,0.2);
+  text-align:center;color:#00f0ff;
+}
+
+/* Overlay para cerrar */
+.overlay {
+  position:fixed;
+  top:0;left:0;
+  width:100%;height:100%;
+  background:rgba(0,0,0,0.5);
+  z-index:1500;
+  display:none;
+}
+.overlay.active {display:block;}
+
+/* Panel lateral flotante */
+.side-panel {
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:90%;
+  max-width:700px;
+  max-height:85vh;
+  background:rgba(0,34,68,0.92);
+  backdrop-filter: blur(15px);
+  border-radius:20px;
+  box-shadow:0 0 30px rgba(0,255,255,0.3);
+  padding:30px 20px 40px;
+  transition:opacity 0.4s ease;
+  z-index:2000;
+  display:none;
+  flex-direction:column;
+  overflow:hidden;
+}
+.side-panel.open { display:flex; animation:fadeIn 0.4s ease forwards; }
+
+@keyframes fadeIn {
+  from {opacity:0; transform:translate(-50%,-48%);}
+  to   {opacity:1; transform:translate(-50%,-50%);}
+}
+
+.side-panel h2 {
+  text-align:center;
+  font-size:1.8rem;
+  margin-bottom:20px;
+  background:linear-gradient(90deg,#00f0ff,#00ffae);
+  -webkit-background-clip:text;
+  color:transparent;
+}
+
+/* Lista en dos columnas con scroll */
+.station-list {
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:15px;
+  overflow-y:auto;
+  max-height:60vh;
+  padding-right:10px;
+}
+.station-list::-webkit-scrollbar {
+  width:8px;
+}
+.station-list::-webkit-scrollbar-thumb {
+  background:rgba(0,240,255,0.4);
+  border-radius:4px;
+}
+.station-list a {
+  background:rgba(0,240,255,0.15);
+  color:#00f0ff;
+  padding:12px 18px;
+  border-radius:12px;
+  text-decoration:none;
+  font-weight:600;
+  text-align:center;
+  transition:all 0.3s ease;
+  display:block;
+}
+.station-list a:hover {
+  background:rgba(0,240,255,0.6);
+  transform:translateY(-3px);
+  box-shadow:0 6px 15px rgba(0,255,255,0.4);
+}
+
+.close-side {
+  position:absolute;
+  top:15px; right:20px;
+  font-size:1.8rem;
+  color:#00f0ff;
+  cursor:pointer;
+  transition:color 0.3s;
+}
+.close-side:hover { color:#00ffae; }
+
+/* Contenedor para imagen y descripción dentro del panel */
+#stationInfoPanel {
+  margin-top:20px;
+  text-align:center;
+}
+#stationInfoPanel img {
+  max-width:100%;
+  border-radius:12px;
+  display:none;
+  margin-bottom:10px;
+}
+#stationInfoPanel div {
+  color:#00f0ff;
+  font-size:1.2rem;
+}
+</style>
+</head>
+<body>
+
+<!-- Barra superior -->
+<nav>
+  <div class="logo">
+    <img src="https://archive.org/download/imagen_mejorada_3D/ppp.png" alt="Logo Izquierdo">
+  </div>
+
+  <ul>
+    <li><a href="#" id="openPanel">Estaciones Meteorológicas <i class="fa-solid fa-bars"></i></a></li>
+  </ul>
+
+  <div class="logo-right">
+    <img src="https://archive.org/download/imagen_mejorada_3D/LOGO%20METEOPMO.png" alt="Logo Derecho">
+  </div>
+</nav>
+
+<!-- Hora -->
+<div class="time-container">
+  <div><i class="fa-solid fa-clock"></i> Hora Local: <span id="horaLocal"></span></div>
+  <div><i class="fa-solid fa-globe"></i> Hora UTC: <span id="horaUTC"></span></div>
+</div>
+
+<!-- Slideshow -->
+<div class="slideshow-container">
+  <div class="slide active"><img src="https://archive.org/download/whats-app-image-2025-09-04-at-22.20.52/WhatsApp%20Image%202025-09-04%20at%2022.20.50.jpeg"></div>
+  <div class="slide"><img src="https://archive.org/download/whats-app-image-2025-09-04-at-22.20.52/WhatsApp%20Image%202025-09-04%20at%2022.20.48%20%281%29.jpeg"></div>
+  <div class="slide"><img src="https://archive.org/download/whats-app-image-2025-09-04-at-22.20.52/WhatsApp%20Image%202025-09-04%20at%2022.20.49%20%281%29.jpeg"></div>
+</div>
+
+<!-- Overlay y panel -->
+<div class="overlay" id="overlay"></div>
+
+<div class="side-panel" id="stationPanel">
+  <span class="close-side" id="closePanel">&times;</span>
+  <h2>Estaciones Meteorológicas</h2>
+  <div class="station-list">
+    <!-- Tus estaciones actuales -->
+    <a href="https://fran5142.github.io/Estaci-n-Quinzona-Isla-Tenglo/" target="_blank"
+       data-img="https://via.placeholder.com/600x300?text=Isla+Tenglo"
+       data-desc="Estación Isla Tenglo: Conectada a Cumulus.">Isla Tenglo</a>
+
+    <a href="https://fran5142.github.io/Estaci-n-Reloncavi/" target="_blank"
+       data-img="https://via.placeholder.com/600x300?text=Isla+Tenglo"
+       data-desc="Estación Isla Tenglo: Conectada a Weatherlick.">Seno Reloncaví</a>
+
+    <a href="https://fran5142.github.io/Estaci-n-Isla-Tabon/" target="_blank"
+       data-img="https://via.placeholder.com/600x300?text=Isla+Tenglo"
+       data-desc="Estación Isla Tenglo: Conectada a Weatherlick.">Isla Tabón</a>
+
+    <a href="https://fran5142.github.io/Estaci-n-Capitan-a-de-Puerto-Maull-n/" target="_blank"
+       data-img="https://via.placeholder.com/600x300?text=Maullin"
+       data-desc="Estación Maullín: Conectada a Cumulus.">Maullín</a>
+    <a href="https://fran5142.github.io/Alcald-a-de-mar-Chacao/" target="_blank"
+       data-img="https://via.placeholder.com/600x300?text=Chacao"
+       data-desc="Estación Canal Chacao: Conectada a Cumulus.">Canal Chacao</a>
+    <a href="https://fran5142.github.io/Estaci-n-Capitan-a-de-Puerto-Ancud/" target="_blank"
+       data-img="https://via.placeholder.com/600x300?text=Ancud"
+       data-desc="Estación Ancud: Conectada a Cumulus.">Ancud</a>
+    <a href="https://fran5142.github.io/Estaci-n-Capitan-a-de-Puerto-Quemchi/" target="_blank"
+       data-img="https://via.placeholder.com/600x300?text=Quemchi"
+       data-desc="Estación Quemchi: Conectada a Cumulus.">Quemchi</a>
+    <a href="https://fran5142.github.io/Estaci-n-Capitan-a-de-Puerto-Chonchi/" target="_blank"
+       data-img="https://via.placeholder.com/600x300?text=Chonchi"
+       data-desc="Estación Chonchi: Conectada a Cumulus.">Chonchi</a>
+    <a href="https://fran5142.github.io/Estaci-n-Capitan-a-de-Puerto-Quell-n/" target="_blank"
+       data-img="https://via.placeholder.com/600x300?text=Quellon"
+       data-desc="Estación Quellón: Conectada a Cumulus.">Quellón</a>
+    <a href="https://fran5142.github.io/Estaci-n-Capitan-a-de-Puerto-Chait-n/" target="_blank"
+       data-img="https://via.placeholder.com/600x300?text=Chaiten"
+       data-desc="Estación Chaitén: Conectada a Cumulus.">Chaitén</a>
+    <a href="https://fran5142.github.io/Estaci-n-Capitan-a-de-Puerto-Melinka/" target="_blank"
+       data-img="https://via.placeholder.com/600x300?text=Melinka"
+       data-desc="Estación Melinka: Conectada a Cumulus.">Melinka</a>
+    <a href="https://fran5142.github.io/Estaci-n-Capitan-a-de-Puerto-Aguirre/" target="_blank"
+       data-img="https://via.placeholder.com/600x300?text=Aguirre"
+       data-desc="Estación Aguirre: Conectada a Cumulus.">Aguirre</a>
+    <a href="https://fran5142.github.io/Estaci-n-Capitan-a-de-Puerto-Chacabuco/" target="_blank"
+       data-img="https://via.placeholder.com/600x300?text=Chacabuco"
+       data-desc="Estación Chacabuco: Conectada a Cumulus.">Chacabuco</a>
+  </div>
+
+  <!-- Contenedor dentro del panel -->
+  <div id="stationInfoPanel">
+    <img id="stationImagePanel" src="" alt="">
+    <div id="stationDescPanel"></div>
+  </div>
+</div>
+
+<footer>
+  Creado por Cabo 2º (Met.) Francisco Salas Muñoz - 26/08/2025
+</footer>
+
+<script>
+// Hora
+function updateTime(){
+  const now=new Date();
+  document.getElementById("horaLocal").textContent=now.toLocaleTimeString();
+  document.getElementById("horaUTC").textContent=now.toUTCString().split(" ")[4];
+}
+setInterval(updateTime,1000); updateTime();
+
+// Slideshow
+let slides=document.querySelectorAll(".slide");
+let current=0;
+setInterval(()=>{
+  slides[current].classList.remove("active");
+  current=(current+1)%slides.length;
+  slides[current].classList.add("active");
+},3000);
+
+// Panel + Overlay
+const panel=document.getElementById("stationPanel");
+const overlay=document.getElementById("overlay");
+document.getElementById("openPanel").onclick=e=>{
+  e.preventDefault();
+  panel.classList.add("open");
+  overlay.classList.add("active");
+};
+document.getElementById("closePanel").onclick=closePanel;
+overlay.onclick=closePanel;
+function closePanel(){
+  panel.classList.remove("open");
+  overlay.classList.remove("active");
+}
+
+// Hover para imagen y descripción dentro del panel
+const stationLinks = document.querySelectorAll('.station-list a');
+const stationImagePanel = document.getElementById('stationImagePanel');
+const stationDescPanel = document.getElementById('stationDescPanel');
+
+stationLinks.forEach(link => {
+  link.addEventListener('mouseenter', () => {
+    const img = link.getAttribute('data-img');
+    const desc = link.getAttribute('data-desc');
+    if(img) {
+      stationImagePanel.src = img;
+      stationImagePanel.style.display = 'block';
+    }
+    stationDescPanel.textContent = desc ? desc : '';
+  });
+  link.addEventListener('mouseleave', () => {
+    // opcional: limpiar al salir
+    // stationImagePanel.style.display = 'none';
+    // stationDescPanel.textContent = '';
+  });
+});
+</script>
+</body>
+</html>
